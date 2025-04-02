@@ -103,7 +103,7 @@ async function main() {
   groupParentId = initData.groupInfo.parentId
   pinTab = initData.groupInfo.pin
 
-  // Listen chagnes of title
+  // Listen changes of title
   titleEl.addEventListener('input', onTitleChange as (e: Event) => void)
 
   if (pinTab) {
