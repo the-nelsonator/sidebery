@@ -92,7 +92,8 @@ import { Mouse } from 'src/services/mouse'
 import { DnD } from 'src/services/drag-and-drop'
 import { Search } from 'src/services/search'
 import * as Favicons from 'src/services/favicons.fg'
-import { NOID, RGB_COLORS } from 'src/defaults'
+import * as TabsColors from 'src/services/tabs.fg.colors'
+import { NOID } from 'src/defaults'
 import * as Utils from 'src/utils'
 import * as Logs from 'src/services/logs'
 import * as Preview from 'src/services/tabs.preview'
@@ -101,19 +102,9 @@ const props = defineProps<{ tabId: ID; iconOnly?: boolean }>()
 const tab = Tabs.byId[props.tabId] as Tab
 
 const tabColor = computed<string>(() => {
-  if (tab.reactive.customColor) return RGB_COLORS[tab.customColor as browser.ColorName]
-  if (
-    Settings.state.colorizeTabsBranches &&
-    tab.reactive.branchColor &&
-    (tab.reactive.isParent || tab.reactive.lvl > 0)
-  ) {
-    return tab.reactive.branchColor
-  } else if (Settings.state.colorizeTabs && tab.reactive.color) {
-    return tab.reactive.color
-  } else {
-    return ''
-  }
+  return TabsColors.getTabColor(tab)
 })
+
 const favPlaceholder = computed((): string => {
   if (tab.reactive.warn) return '#icon_warn'
   return Favicons.getFavPlaceholder(tab.reactive.url)

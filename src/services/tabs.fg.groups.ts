@@ -4,6 +4,7 @@ import { GroupMsg } from 'src/injections/group.ipc'
 import { Windows } from 'src/services/windows'
 import { Settings } from 'src/services/settings'
 import { Tabs } from './tabs.fg'
+import * as TabColors from './tabs.fg.colors'
 import { GroupConfigResult, Sidebar } from './sidebar'
 import * as Favicons from './favicons.fg'
 import * as IPC from './ipc'
@@ -181,6 +182,7 @@ export async function getGroupInfo(groupTabId: ID): Promise<GroupInfo | null> {
     index: groupTab.index,
     len: 0,
     tabs: [] as GroupedTabInfo[],
+    color: TabColors.getTabColor(groupTab),
   }
 
   const parentTab = Tabs.byId[groupTab.parentId]
@@ -209,6 +211,8 @@ export async function getGroupInfo(groupTabId: ID): Promise<GroupInfo | null> {
       url: tab.url,
       discarded: !!tab.discarded,
       favIconUrl: tab.favIconUrl ?? '',
+      color: TabColors.getTabColor(tab),
+      containerColor: TabColors.getTabContainerColor(tab),
     })
   }
 

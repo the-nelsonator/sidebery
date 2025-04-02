@@ -171,7 +171,7 @@ function isTransparent(color?: RGBA): boolean {
   return color[3] !== 1
 }
 
-function toColorString(rgba?: RGBA | RGB | string | null, noAlpha?: boolean): string {
+export function toColorString(rgba?: RGBA | RGB | string | null, noAlpha?: boolean): string {
   if (!rgba) return '#000'
   if (!Array.isArray(rgba)) return rgba
   if (rgba[3] === undefined || rgba[3] === 1 || noAlpha) {

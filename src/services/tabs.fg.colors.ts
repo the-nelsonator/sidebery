@@ -1,8 +1,9 @@
-import { NOID } from 'src/defaults'
+import { NOID, RGB_COLORS } from 'src/defaults'
 import * as Utils from 'src/utils'
 import { Containers } from './containers'
 import { Settings } from './settings'
 import { Tabs } from './tabs.fg'
+import { Tab } from 'src/types'
 
 const CONTAINER_COLORS: Record<string, string> = {
   blue: '#37adff',
@@ -116,4 +117,39 @@ export function setCustomColor(tabIds: ID[], color: string): void {
   }
 
   Tabs.cacheTabsData()
+}
+
+export function getTabColorById(tabId: ID): string {
+  const tab = Tabs.byId[tabId]
+  if (!tab) return ''
+
+  return getTabColor(tab)
+}
+
+export function getTabColor(tab: Tab): string {
+  if (!tab) return ''
+
+  if (tab.reactive.customColor) return RGB_COLORS[tab.customColor as browser.ColorName]
+  if (
+    Settings.state.colorizeTabsBranches &&
+    tab.reactive.branchColor &&
+    (tab.reactive.isParent || tab.reactive.lvl > 0)
+  ) {
+    return tab.reactive.branchColor
+  } else if (Settings.state.colorizeTabs && tab.reactive.color) {
+    return tab.reactive.color
+  } else {
+    return ''
+  }
+}
+
+export function getTabContainerColorById(tabId: ID): string {
+  const tab = Tabs.byId[tabId]
+  if (!tab) return ''
+
+  return getTabContainerColor(tab)
+}
+
+export function getTabContainerColor(tab: Tab): string {
+  return tab.reactive.containerColor ?? ''
 }

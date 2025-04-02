@@ -136,6 +136,8 @@ export interface GroupedTabInfo {
   favPlaceholderSvgEl?: SVGElement
   titleEl?: HTMLElement
   urlEl?: HTMLElement
+  color?: string
+  containerColor?: string
 }
 
 export interface GroupPin {
@@ -157,6 +159,7 @@ export interface GroupInfo {
   tabs: GroupedTabInfo[]
   parentId?: ID
   pin?: GroupPin
+  color?: string
 }
 
 export interface GroupConfig {

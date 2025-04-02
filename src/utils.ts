@@ -383,6 +383,12 @@ export function HSLtoRGB(hue: number, sat: number, lit: number): [number, number
   return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)]
 }
 
+export function addAlphaToColor(color?: string | RGB | RGBA | null, alpha: number): RGBA {
+  const rgb = toRGBA(color)
+  if (!rgb) return [0, 0, 0, alpha]
+  return [rgb[0], rgb[1], rgb[2], alpha]
+}
+
 /**
  * Convert key to css variable --kebab-case
  */

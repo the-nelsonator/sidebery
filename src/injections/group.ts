@@ -1,4 +1,4 @@
-import { sleep } from 'src/utils'
+import { sleep, addAlphaToColor } from 'src/utils'
 import { GroupPin, GroupedTabInfo, InstanceType, GroupConfig } from 'src/types'
 import { GroupPageInitData } from 'src/services/tabs.bg.actions'
 import { getFavPlaceholder } from 'src/services/favicons'
@@ -7,6 +7,7 @@ import { applyThemeSrcVars, loadCustomGroupCSS } from './group.styles'
 import * as IPC from 'src/services/ipc'
 import * as Logs from 'src/services/logs'
 import { GroupMsg } from './group.ipc'
+import { toColorString } from 'src/services/styles.actions'
 
 const PIN_SCREENSHOT_QUALITY = 90
 const SCREENSHOT_QUALITY = 25
@@ -409,6 +410,11 @@ function createTabEl(info: GroupedTabInfo, clickHandler: (e: MouseEvent) => void
   })
   closeBtnEl.title = browser.i18n.getMessage('group_tab_close_tooltip')
   ctrlsEl.appendChild(closeBtnEl)
+
+  if (info.color) {
+    const colorWithAlpha = toColorString(addAlphaToColor(info.color, 0.2))
+    info.el.style.setProperty('--tab-color', colorWithAlpha)
+  }
 
   info.el.addEventListener('mousedown', e => e.stopPropagation())
   info.el.addEventListener('click', clickHandler)
