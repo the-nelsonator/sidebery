@@ -183,6 +183,7 @@ export async function getGroupInfo(groupTabId: ID): Promise<GroupInfo | null> {
     len: 0,
     tabs: [] as GroupedTabInfo[],
     color: TabColors.getTabColor(groupTab),
+    containerColor: TabColors.getTabContainerColor(groupTab),
   }
 
   const parentTab = Tabs.byId[groupTab.parentId]
@@ -278,6 +279,8 @@ export function updateGroupTab(groupTab: Tab) {
       url: tab.url,
       discarded: !!tab.discarded,
       favIconUrl: tab.favIconUrl ?? '',
+      color: TabColors.getTabColor(tab),
+      containerColor: TabColors.getTabContainerColor(tab),
     })
   }
 
@@ -324,6 +327,8 @@ export function updateGroupChild(groupId: ID, childId: ID, delay = 250): void {
       lvl: childTab.lvl - groupTab.lvl - 1,
       discarded: !!childTab.discarded,
       favIconUrl: childTab.favIconUrl || Favicons.getFavicon(childTab.url),
+      color: TabColors.getTabColor(childTab),
+      containerColor: TabColors.getTabContainerColor(childTab),
     }
     IPC.groupPage(groupTab.id, { updatedTab })
   }, delay)

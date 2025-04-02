@@ -160,6 +160,7 @@ export interface GroupInfo {
   parentId?: ID
   pin?: GroupPin
   color?: string
+  containerColor?: string
 }
 
 export interface GroupConfig {

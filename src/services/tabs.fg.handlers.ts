@@ -17,6 +17,7 @@ import * as Preview from 'src/services/tabs.preview'
 import { Search } from './search'
 import { Containers } from './containers'
 import { Mouse } from './mouse'
+import * as TabColors from './tabs.fg.colors'
 
 const EXT_HOST = browser.runtime.getURL('').slice(16)
 const URL_HOST_PATH_RE = /^([a-z0-9-]{1,63}\.)+\w+(:\d+)?\/[A-Za-z0-9-._~:/?#[\]%@!$&'()*+,;=]*$/
@@ -532,6 +533,8 @@ function onTabCreated(nativeTab: NativeTab, attached?: boolean): void {
             url: tab.url,
             discarded: !!tab.discarded,
             favIconUrl: tab.favIconUrl,
+            color: TabColors.getTabColor(tab),
+            containerColor: TabColors.getTabContainerColor(tab),
           },
         })
       }

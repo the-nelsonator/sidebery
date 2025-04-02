@@ -4,6 +4,8 @@ import { Containers } from './containers'
 import { Settings } from './settings'
 import { Tabs } from './tabs.fg'
 import { Tab } from 'src/types'
+import * as IPC from './ipc'
+import * as TabColors from './tabs.fg.colors'
 
 const CONTAINER_COLORS: Record<string, string> = {
   blue: '#37adff',
@@ -49,6 +51,8 @@ export function colorizeTab(tabId: ID): void {
   }
 
   tab.reactive.color = color
+
+  updateGroupPage(tab)
 }
 
 export function colorizeBranches(): void {
@@ -76,6 +80,8 @@ export function colorizeBranch(rootId: ID): void {
     if (tab.lvl === 0) break
 
     tab.reactive.branchColor = color
+
+    updateGroupPage(tab)
   }
 }
 
@@ -98,6 +104,7 @@ export function setBranchColor(tabId: ID): void {
 
   if (parent.reactive.branchColor) {
     tab.reactive.branchColor = parent.reactive.branchColor
+    updateGroupPage(tab)
   } else {
     Tabs.colorizeBranch(parent.id)
   }
@@ -114,6 +121,8 @@ export function setCustomColor(tabIds: ID[], color: string): void {
     tab.reactive.customColor = tab.customColor ?? null
 
     Tabs.saveTabData(tab.id)
+
+    updateGroupPage(tab)
   }
 
   Tabs.cacheTabsData()
@@ -152,4 +161,24 @@ export function getTabContainerColorById(tabId: ID): string {
 
 export function getTabContainerColor(tab: Tab): string {
   return tab.reactive.containerColor ?? ''
+}
+
+function updateGroupPage(tab: Tab): void {
+  const groupTab = Tabs.getGroupTab(tab)
+  if (groupTab && !groupTab.discarded) {
+    IPC.groupPage(groupTab.id, {
+      index: groupTab.index,
+      updatedTab: {
+        id: tab.id,
+        index: tab.index,
+        lvl: tab.lvl - groupTab.lvl - 1,
+        title: tab.title,
+        url: tab.url,
+        discarded: !!tab.discarded,
+        favIconUrl: tab.favIconUrl,
+        color: TabColors.getTabColor(tab),
+        containerColor: TabColors.getTabContainerColor(tab),
+      },
+    })
+  }
 }
