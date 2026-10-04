@@ -509,6 +509,7 @@ export async function moveToThisWin(
       tab.reactive.folded = tab.folded = false
       if (tab.urgentTabIds?.size) tab.reactive.hasUrgentDescendant = false
       tab.urgentTabIds?.clear()
+      Tabs.syncParentTabFlag(tab)
     }
 
     // Check if media badges recalc is needed
@@ -652,6 +653,7 @@ export function detachTabs(tabIds: ID[]): DetachedTabsInfo | undefined {
     delete Tabs.byId[id]
     Tabs.list.splice(tab.index, 1)
     if (tab.isGroup) Tabs.unregisterGroupTab(id)
+    Tabs.unregisterParentTab(id)
 
     // Check if media badges recalc is needed
     if (!updMediaBadges && (tab.audible || tab.mediaPaused || tab.mutedInfo?.muted)) {

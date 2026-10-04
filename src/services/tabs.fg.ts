@@ -2052,6 +2052,9 @@ export function updateTabsTree(startIndex = 0, endIndex = -1): void {
   if (foldedBranchLvl > -1 && foldedBranchRoot) {
     foldedBranchRoot.reactive.branchLen = foldedBranchLenCount
   }
+
+  // Sync parent-tabs index (for "Move to" menu) over the processed range
+  Tabs.syncParentTabsRange(startIndex, endIndex)
 }
 
 /**

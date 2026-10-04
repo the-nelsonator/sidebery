@@ -37,7 +37,11 @@ function getExcludedGroupIds(): Set<ID> {
 
 /**
  * Turn a nested `Tabs.GroupNode[]` structure into "Move to" menu options,
- * dropping excluded groups (and their whole sub-tree) along the way.
+ * dropping excluded groups/parent-tabs (and their whole sub-tree) along the
+ * way. A node may be an actual group tab or, when
+ * `Settings.state.allowMovingToParentTabs` is on, a plain parent tab -
+ * distinguished here by `tab.isGroup` for icon purposes only, everything
+ * else (label, color, move target) is generic over either kind.
  */
 function groupNodesToMoveOpts(
   nodes: Tabs.GroupNode[],
@@ -55,7 +59,7 @@ function groupNodesToMoveOpts(
 
     const opt: MenuOption = {
       label: tab.customTitle ?? tab.title,
-      icon: 'icon_group',
+      icon: tab.isGroup ? 'icon_group' : 'icon_tab',
       badge: 'icon_move_badge',
       onClick: () => {
         const items = Selection.getTabsInfo(true)
@@ -131,7 +135,7 @@ export const tabsMenuOptions: Record<string, () => MenuOption | MenuOption[] | u
       if (!Utils.isTabsPanel(panel)) continue
 
       const isOwnPanel = probeTab.panelId === panel.id
-      const groupStruct = Tabs.getGroupsStruct(panel.id)
+      const groupStruct = Tabs.getGroupsStruct(panel.id, Settings.state.allowMovingToParentTabs)
       const groupOpts = groupNodesToMoveOpts(groupStruct, excludedGroupIds, probeTab)
 
       // Own panel is only shown (inactive, with its groups as a sub-menu)

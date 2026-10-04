@@ -1248,6 +1248,7 @@ function onTabRemoved(tabId: ID, info: browser.tabs.RemoveInfo, detached?: boole
         newTab.reactive.folded = tab.folded
         newTab.isParent = tab.isParent
         newTab.reactive.isParent = tab.isParent
+        Tabs.syncParentTabFlag(newTab)
         Tabs.forEachDescendant(tab, t => {
           if (t.parentId === tab.id) {
             t.parentId = newTab.id
@@ -1311,6 +1312,7 @@ function onTabRemoved(tabId: ID, info: browser.tabs.RemoveInfo, detached?: boole
             if (!firstChild.isParent) {
               firstChild.isParent = true
               firstChild.reactive.isParent = true
+              Tabs.syncParentTabFlag(firstChild)
             }
           }
           // Outdent
@@ -1352,6 +1354,7 @@ function onTabRemoved(tabId: ID, info: browser.tabs.RemoveInfo, detached?: boole
   delete Tabs.byId[tabId]
   Tabs.list.splice(tab.index, 1)
   if (tab.isGroup) Tabs.unregisterGroupTab(tabId)
+  Tabs.unregisterParentTab(tabId)
   Sidebar.recalcTabsPanels()
 
   // Update url counter
@@ -1398,6 +1401,7 @@ function onTabRemoved(tabId: ID, info: browser.tabs.RemoveInfo, detached?: boole
           parentTab.folded = false
           parentTab.reactive.isParent = false
           parentTab.reactive.folded = false
+          Tabs.syncParentTabFlag(parentTab)
         }
       }
     }
