@@ -486,6 +486,7 @@ async function onTabCreated(nativeTab: NativeTab, attached?: boolean) {
   if (panel) tab.panelId = panel.id
   tab.internal = tab.url.startsWith(D.ADDON_HOST)
   if (tab.internal) tab.isGroup = Utils.isGroupUrl(tab.url)
+  if (tab.isGroup && !tab.pinned) Tabs.registerGroupTab(tab.id)
   tab.index = index
   tab.parentId = Settings.state.tabsTree ? (tab.openerTabId ?? D.NOID) : D.NOID
   if (!tab.favIconUrl && !tab.internal && !tab.url.startsWith('a')) {
@@ -856,6 +857,10 @@ function onTabUpdated(tabId: ID, change: browser.tabs.ChangeInfo, nativeTab: Nat
       const isGroup = isInternal && Utils.isGroupUrl(change.url)
       if (tab.isGroup !== isGroup) {
         tab.reactive.isGroup = tab.isGroup = isGroup
+        if (!tab.pinned) {
+          if (isGroup) Tabs.registerGroupTab(tab.id)
+          else Tabs.unregisterGroupTab(tab.id)
+        }
       }
       tab.internal = isInternal
       Tabs.cacheTabsData()
@@ -1346,6 +1351,7 @@ function onTabRemoved(tabId: ID, info: browser.tabs.RemoveInfo, detached?: boole
   }
   delete Tabs.byId[tabId]
   Tabs.list.splice(tab.index, 1)
+  if (tab.isGroup) Tabs.unregisterGroupTab(tabId)
   Sidebar.recalcTabsPanels()
 
   // Update url counter

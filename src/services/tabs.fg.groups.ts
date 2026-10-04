@@ -390,3 +390,95 @@ export async function setGroupName(groupTabId: ID, newName: string) {
     browser.tabs.update(groupTabId, { url: newUrl }).catch(err => Logs.warn('setGroupName:', err))
   }
 }
+
+// ---
+// -- Groups index (for "Move to" menu)
+// -
+
+/**
+ * Nested group structure for one panel, built from `groupTabIds`
+ * rather than by scanning `Tabs.list` on every use.
+ */
+export interface GroupNode {
+  id: ID
+  kids: GroupNode[]
+}
+
+/** Ids of all group tabs of this window (any panel, excluding pinned) */
+export const groupTabIds = new Set<ID>()
+
+let groupsStructRev = 0
+let groupsStructCacheRev = -1
+let groupsStructCache: Map<ID, GroupNode[]> = new Map()
+
+/**
+ * (Re)build `groupTabIds` from scratch, e.g. after restoring tabs state.
+ */
+export function resetGroupsIndex(tabs: T.Tab[]): void {
+  groupTabIds.clear()
+  for (const tab of tabs) {
+    if (tab.isGroup && !tab.pinned) groupTabIds.add(tab.id)
+  }
+  invalidateGroupsStruct()
+}
+
+export function registerGroupTab(tabId: ID): void {
+  if (groupTabIds.has(tabId)) return
+  groupTabIds.add(tabId)
+  invalidateGroupsStruct()
+}
+
+export function unregisterGroupTab(tabId: ID): void {
+  if (!groupTabIds.has(tabId)) return
+  groupTabIds.delete(tabId)
+  invalidateGroupsStruct()
+}
+
+/**
+ * Mark the cached nested group structures as stale, without touching
+ * `groupTabIds` itself (e.g. after a move/sort that only changed order).
+ */
+export function invalidateGroupsStruct(): void {
+  groupsStructRev++
+}
+
+/**
+ * Get the nested tree of group tabs (as `GroupNode`s) for one panel,
+ * in tab order. Cached until the next structural change.
+ */
+export function getGroupsStruct(panelId: ID): GroupNode[] {
+  if (groupsStructCacheRev !== groupsStructRev) {
+    groupsStructCache = new Map()
+    groupsStructCacheRev = groupsStructRev
+  }
+
+  const cached = groupsStructCache.get(panelId)
+  if (cached) return cached
+
+  const panelGroupTabs: T.Tab[] = []
+  for (const id of groupTabIds) {
+    const tab = Tabs.byId[id]
+    if (!tab || tab.pinned || tab.panelId !== panelId) continue
+    panelGroupTabs.push(tab)
+  }
+  panelGroupTabs.sort((a, b) => a.index - b.index)
+
+  const nodesById = new Map<ID, GroupNode>()
+  for (const tab of panelGroupTabs) nodesById.set(tab.id, { id: tab.id, kids: [] })
+
+  const roots: GroupNode[] = []
+  for (const tab of panelGroupTabs) {
+    const node = nodesById.get(tab.id)
+    if (!node) continue
+
+    let parent = Tabs.byId[tab.parentId]
+    while (parent && !parent.isGroup) parent = Tabs.byId[parent.parentId]
+
+    const parentNode = parent ? nodesById.get(parent.id) : undefined
+    if (parentNode) parentNode.kids.push(node)
+    else roots.push(node)
+  }
+
+  groupsStructCache.set(panelId, roots)
+  return roots
+}

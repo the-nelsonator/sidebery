@@ -395,6 +395,7 @@ async function restoreTabsState(src?: LoadSrc, ignoreLockedTabs?: boolean): Prom
   tabs = await restoreTabPanelsContent(tabs)
 
   list = tabs
+  Tabs.resetGroupsIndex(tabs)
   Sidebar.recalcTabsPanels()
   if (Settings.state.tabsTree) updateTabsTree()
   Sidebar.recalcVisibleTabs()
@@ -2103,6 +2104,7 @@ export function updateTabsIndexes(fromIndex = 0, toIndex = -1): void {
     t = tabs[i]
     if (t && t.index !== i) t.index = i
   }
+  Tabs.invalidateGroupsStruct()
 }
 
 const enum SuccessorSearchMode {
