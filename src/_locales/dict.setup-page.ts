@@ -3584,6 +3584,17 @@ Available parameters:
     zh_TW: '顯示已釘選分頁的標題',
     ja: '固定タブのタイトルを表示する',
   },
+  'settings.pinned_tabs_single_line': {
+    en: 'Keep pinned tabs on a single line',
+    de: 'Angeheftete Tabs in einer Zeile halten',
+    fr: 'Garder les onglets épinglés sur une seule ligne',
+    hu: 'A rögzített lapok egy sorban tartása',
+    pl: 'Przypięte karty w jednym wierszu',
+    ru: 'Закрепленные вкладки в одну строку',
+    zh_CN: '将已固定标签页保持在单行',
+    zh_TW: '將已釘選分頁保持在單行',
+    ja: '固定タブを 1 行に収める',
+  },
   'settings.pinned.no_unload': {
     en: 'Prevent pinned tabs from unloading',
     de: 'Verhindere Entladen von angehefteten Tabs',

@@ -131,6 +131,7 @@ export interface SettingsState {
   // Pinned tabs
   pinnedTabsPosition: (typeof SETTINGS_OPTIONS.pinnedTabsPosition)[number]
   pinnedTabsList: boolean
+  pinnedTabsSingleLine: boolean
   pinnedAutoGroup: boolean
   pinnedNoUnload: boolean
   pinnedNoUnloadExplicit: boolean

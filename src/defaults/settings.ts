@@ -131,6 +131,7 @@ export const DEFAULT_SETTINGS: SettingsState = {
   // Pinned tabs
   pinnedTabsPosition: 'top',
   pinnedTabsList: false,
+  pinnedTabsSingleLine: false,
   pinnedAutoGroup: false,
   pinnedNoUnload: false,
   pinnedNoUnloadExplicit: true,

@@ -14,6 +14,7 @@
   :data-animations="animations"
   :data-pinned-tabs-position="Settings.state.pinnedTabsPosition"
   :data-pinned-tabs-list="Settings.state.pinnedTabsList"
+  :data-pinned-tabs-single-line="Settings.state.pinnedTabsSingleLine"
   :data-tabs-tree-lvl-marks="Settings.state.tabsLvlDots"
   :data-tabs-close-btn="Settings.state.tabRmBtn"
   :data-drag="DnD.reactive.isStarted"

@@ -325,6 +325,13 @@ section(ref="el")
       :default="DEFAULT_SETTINGS.pinnedTabsList"
       @update:value="Settings.saveDebounced(150)")
     ToggleField(
+      label="settings.pinned_tabs_single_line"
+      :inactive="(Settings.state.pinnedTabsPosition !== 'panel' && Settings.state.pinnedTabsPosition !== 'top') || Settings.state.pinnedTabsList"
+      dbg="pinnedTabsSingleLine"
+      v-model:value="Settings.state.pinnedTabsSingleLine"
+      :default="DEFAULT_SETTINGS.pinnedTabsSingleLine"
+      @update:value="Settings.saveDebounced(150)")
+    ToggleField(
       label="settings.pinned.no_unload"
       dbg="pinnedNoUnload"
       v-model:value="Settings.state.pinnedNoUnload"
