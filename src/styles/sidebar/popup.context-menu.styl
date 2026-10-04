@@ -283,10 +283,14 @@
   &:before
     content: ''
     position: absolute
-    top: 0
+    top: 2px
     left: calc(var(--ctx-menu-text-opt-inner-gap) * -1)
-    height: 100%
+    height: calc(100% - 4px)
     width: var(--flag-btn-full-width)
+    border-radius: var(--ctx-menu-opt-border-radius)
+  &:hover:before
+    background-color: var(--ctx-menu-fg)
+    opacity: .16
   svg.sub-icon
     position: absolute
     width: 16px
