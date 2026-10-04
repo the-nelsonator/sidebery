@@ -60,6 +60,7 @@ function groupNodesToMoveOpts(
     const opt: MenuOption = {
       label: tab.customTitle ?? tab.title,
       icon: tab.isGroup ? 'icon_group' : 'icon_tab',
+      img: tab.isGroup ? undefined : tab.favIconUrl,
       badge: 'icon_move_badge',
       onClick: () => {
         const items = Selection.getTabsInfo(true)
