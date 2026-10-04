@@ -41,11 +41,13 @@ const dropToEnd = computed(() => DnD.reactive.dstPin && dropId.value === NOID)
 
 const barEl = useTemplateRef<HTMLElement>('barEl')
 
-// Position is fixed for the lifetime of this mount - Sidebar.reMountSidebar()
-// recreates the whole sidebar tree on every settings change, matching the
-// non-reactive module-level `let`s sidebar.vue itself uses for the same thing.
-const pos = Settings.state.pinnedTabsPosition
-const vertical = pos === 'left' || pos === 'right'
+// Fixed for the lifetime of this mount - Sidebar.reMountSidebar() recreates
+// the whole sidebar tree on every settings change, matching the non-reactive
+// module-level `let`s sidebar.vue itself uses for the same thing.
+// Settings.pinnedTabsBarVertical is the single shared source of truth for
+// the scroll axis (left/right positions, or a row-capped titled list) so
+// this component and Tabs.scrollToPinnedTab can't drift out of sync.
+const vertical = Settings.pinnedTabsBarVertical
 const scrollable =
   vertical || (Settings.state.pinnedTabsSingleLine && !Settings.state.pinnedTabsList)
 
@@ -129,7 +131,11 @@ function onDragOver(e: DragEvent): void {
   if (!el || !scrollable) return
 
   const box = el.getBoundingClientRect()
-  const edge = 24
+  // Clamp to the box's own size: a capped titled list can be as short as one
+  // row (~32px), where a fixed 24px edge zone would cover the whole box and
+  // make it impossible to hover anywhere without triggering autoscroll.
+  const size = vertical ? box.height : box.width
+  const edge = Math.min(24, Math.floor(size / 3))
   const step = 12
   if (vertical) {
     if (e.clientY - box.top < edge) el.scrollTop -= step
@@ -165,9 +171,12 @@ onBeforeUnmount(() => {
   resizeObserver = null
 })
 
-// A ResizeObserver on the bar does NOT fire when a pin is added/removed: in
-// nowrap/column mode the bar's own border-box size is fixed (100% of its
-// flex parent), only its scrollWidth/scrollHeight changes.
+// A ResizeObserver on the bar does NOT reliably fire when a pin is
+// added/removed: in nowrap/column mode the bar's own border-box size is
+// fixed (100% of its flex parent), only its scrollWidth/scrollHeight
+// changes - except in capped titled-list mode, where the bar grows with its
+// content up to the cap, so the observer alone would do for that case. The
+// watch below covers every case uniformly.
 watch(
   () => pinnedTabs.value.length,
   () => recalcOverflow(),

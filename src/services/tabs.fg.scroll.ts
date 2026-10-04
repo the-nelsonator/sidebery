@@ -60,8 +60,7 @@ export function scrollToPinnedTab(id: ID, smooth?: boolean): void {
   const barEl = wrapperEl?.parentElement
   if (!el || !wrapperEl || !barEl || !barEl.classList.contains('PinnedTabsBar')) return
 
-  const vertical =
-    Settings.state.pinnedTabsPosition === 'left' || Settings.state.pinnedTabsPosition === 'right'
+  const vertical = Settings.pinnedTabsBarVertical
   const scrollSize = vertical ? barEl.scrollHeight : barEl.scrollWidth
   const clientSize = vertical ? barEl.clientHeight : barEl.clientWidth
   if (!clientSize || scrollSize - clientSize <= 1) return

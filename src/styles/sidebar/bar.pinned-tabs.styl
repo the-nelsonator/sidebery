@@ -76,10 +76,14 @@
   opacity: var(--sep-opacity)
   background-image: linear-gradient(90deg, transparent, var(--frame-fg) 10%, var(--frame-fg) 90%, transparent)
 
-#root[data-pinned-tabs-position="panel"][data-pinned-tabs-list="true"] .PinnedTabsBar:after
+// Not shown in capped mode: an absolutely-positioned child of a scroll
+// container scrolls with its content, so it would sit over the last visible
+// row at scrollTop:0 and slide away as you scroll - capped mode uses the
+// edge fade below instead.
+#root[data-pinned-tabs-position="panel"][data-pinned-tabs-list="true"]:not([data-pinned-tabs-list-capped="true"]) .PinnedTabsBar:after
   display: block
 
-#root[data-pinned-tabs-position="top"][data-pinned-tabs-list="true"] .PinnedTabsBar:after
+#root[data-pinned-tabs-position="top"][data-pinned-tabs-list="true"]:not([data-pinned-tabs-list-capped="true"]) .PinnedTabsBar:after
   display: block
 
 // ---
@@ -157,6 +161,12 @@
   flex-wrap: nowrap
   overflow-x: auto
   overflow-y: hidden
+  // The bar is a column-flex child sibling to a height:100% ScrollBox/
+  // .panel-box, so the flex line is always over-constrained; overflow:auto
+  // already zeroes this element's automatic minimum size, so without an
+  // explicit flex-shrink:0 it gets squeezed a few px short of
+  // --tabs-pinned-height.
+  flex-shrink: 0
   scrollbar-width: none
   overscroll-behavior: contain
   .tab-wrapper
@@ -169,6 +179,31 @@
   // scroll range
   overflow-x: clip
   overflow-y: auto
+  scrollbar-width: none
+  overscroll-behavior: contain
+  .tab-wrapper
+    flex-shrink: 0
+
+// Capped titled list: the list still wraps into full-width rows, but is now
+// height-limited to N rows and scrolls instead of growing forever.
+//
+// The 3-attribute selector (position + list + capped) isn't logically
+// necessary - [data-pinned-tabs-list-capped="true"] alone already implies
+// panel/top + list - it's there purely so this rule's specificity beats the
+// list-mode padding rule above (bar.pinned-tabs.styl:25-27 / 61-63).
+#root[data-pinned-tabs-position="panel"][data-pinned-tabs-list="true"][data-pinned-tabs-list-capped="true"] .PinnedTabsBar
+#root[data-pinned-tabs-position="top"][data-pinned-tabs-list="true"][data-pinned-tabs-list-capped="true"] .PinnedTabsBar
+  // one titled row = .Tab's min-height + its own bottom padding (tab.styl)
+  max-height: calc(var(--pinned-list-max-rows) * (var(--tabs-min-height) + var(--tabs-margin)))
+  // the list-mode separator's reserved space must live OUTSIDE the scroll
+  // box (border-box sizing would otherwise count it against max-height, and
+  // as padding it would also show up as dead scrollable space at the end)
+  padding-bottom: 0
+  margin-bottom: calc(var(--tabs-margin) + 9px)
+  overflow-x: clip
+  overflow-y: auto
+  // see the flex-shrink comment on the single-line rule above - same issue
+  flex-shrink: 0
   scrollbar-width: none
   overscroll-behavior: contain
   .tab-wrapper
@@ -210,10 +245,13 @@
 
 #root[data-pinned-tabs-position="left"]:not([data-drag="true"]) .PinnedTabsBar[data-overflow="start"]
 #root[data-pinned-tabs-position="right"]:not([data-drag="true"]) .PinnedTabsBar[data-overflow="start"]
+#root[data-pinned-tabs-list-capped="true"]:not([data-drag="true"]) .PinnedTabsBar[data-overflow="start"]
   mask-image: linear-gradient(180deg, transparent 0, #000 var(--pt-fade), #000 100%)
 #root[data-pinned-tabs-position="left"]:not([data-drag="true"]) .PinnedTabsBar[data-overflow="end"]
 #root[data-pinned-tabs-position="right"]:not([data-drag="true"]) .PinnedTabsBar[data-overflow="end"]
+#root[data-pinned-tabs-list-capped="true"]:not([data-drag="true"]) .PinnedTabsBar[data-overflow="end"]
   mask-image: linear-gradient(180deg, #000 0, #000 calc(100% - var(--pt-fade)), transparent 100%)
 #root[data-pinned-tabs-position="left"]:not([data-drag="true"]) .PinnedTabsBar[data-overflow="both"]
 #root[data-pinned-tabs-position="right"]:not([data-drag="true"]) .PinnedTabsBar[data-overflow="both"]
+#root[data-pinned-tabs-list-capped="true"]:not([data-drag="true"]) .PinnedTabsBar[data-overflow="both"]
   mask-image: linear-gradient(180deg, transparent 0, #000 var(--pt-fade), #000 calc(100% - var(--pt-fade)), transparent 100%)
